@@ -1,0 +1,35 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-ast
+      - id: check-added-large-files
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: check-docstring-first
+      - id: check-json
+      - id: check-yaml
+      - id: debug-statements
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: mixed-line-ending
+
+  - repo: local
+    hooks:
+      - id: ruff-formatter
+        name: ruff formatter
+        entry: uv run --active ruff format .
+        language: system
+        types: [python]
+      - id: ruff-linter
+        name: ruff linter
+        language: system
+        types: [python]
+        entry: uv run --active ruff check .
+      - id: mypy
+        name: mypy
+        entry: uv run mypy .
+        require_serial: true
+        language: system
+        types: [python]
+        pass_filenames: false
