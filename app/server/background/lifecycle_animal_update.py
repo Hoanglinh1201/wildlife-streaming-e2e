@@ -26,8 +26,9 @@ async def lifecycle_animal_update(
                 removed_animals[animal_id] = animal
 
         # Spawn new animals
-        for _ in range(settings.SPAWN_NR):
-            new_animal = spawn_animal()
-            animals[new_animal.id] = new_animal
+        if len(animals) <= settings.ANIMAL_LIMIT:
+            for _ in range(settings.SPAWN_NR):
+                new_animal = spawn_animal()
+                animals[new_animal.id] = new_animal
 
         await asyncio.sleep(settings.SPAWN_INTERVAL_SECONDS)

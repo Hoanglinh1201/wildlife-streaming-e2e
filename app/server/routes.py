@@ -5,11 +5,9 @@ from typing import Any
 
 from fastapi import APIRouter, HTTPException
 
-from app.model.animal import Animal
-from app.model.tracker import Tracker
 from app.server.lifespan import ANIMALS, REMOVED_ANIMALS
 
-router = APIRouter(prefix="/animals", tags=["Animals"])
+router = APIRouter()
 
 
 @router.get("/live", response_model=list[str])
@@ -24,33 +22,44 @@ def list_dead_animal_ids() -> list[str]:
     return list(REMOVED_ANIMALS.keys())
 
 
-@router.get("/{animal_id}", response_model=Animal)
-def get_animal_by_id(animal_id: str) -> Animal:
-    """Return full animal data by ID."""
-    animal = ANIMALS.get(animal_id) or REMOVED_ANIMALS.get(animal_id)
-    if not animal:
-        raise HTTPException(status_code=404, detail="Animal not found")
-    return animal
-
-
-@router.get("/{animal_id}/tracker", response_model=Tracker)
-def get_tracker_by_animal_id(animal_id: str) -> Tracker:
-    """Return the tracker assigned to the animal."""
-    animal = ANIMALS.get(animal_id) or REMOVED_ANIMALS.get(animal_id)
-    if not animal:
-        raise HTTPException(status_code=404, detail="Animal not found")
-    return animal.tracker
-
-
 @router.get("/coordinates", response_model=list[dict[str, Any]])
 def get_all_animal_coordinates() -> list[dict[str, Any]]:
     """Return all animals with their coordinates."""
     coordinates = [
         {
-            "id": k,
+            "animal_id": k,
             "coordinate": [v.tracker.lon, v.tracker.lat],
             "timestamp": int(datetime.now().timestamp() * 1000),
         }
         for k, v in ANIMALS.items()
     ]
     return coordinates
+
+
+@router.get("/tracking_metadata", response_model=list[dict[str, Any]])
+def get_tracking_metadata() -> list[dict[str, Any]]:
+    """Return metadata for all animals."""
+    try:
+        return [
+            {
+                "animal_id": k,
+                "type": v.animal_type.value,
+                "species": v.species.value,
+                "icon": v.icon.value,
+                "born_at": v.born_at.isoformat(),
+                "age": v.age,
+                "gender": v.gender,
+                "length_cm": v.length_cm,
+                "weight_kg": v.weight_kg,
+                "tracker_id": v.tracker.id,
+                "tracker_type": v.tracker.type.value,
+                "tracker_battery": v.tracker.battery_level,
+                "tracker_status": v.tracker.status.value,
+            }
+            for k, v in ANIMALS.items()
+        ]
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error retrieving tracking metadata: {e!s}",
+        ) from e
