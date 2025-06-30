@@ -1,33 +1,38 @@
 import asyncio
+import logging
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from app.components.simulator.initialize import initialize_packs
-from app.model.pack import Pack
-from app.server.background.movement_update import update_packs_minutely
+from app.model.animal import Animal
+from app.server.background.lifecycle_animal_update import lifecycle_animal_update
+from app.server.background.move_update import move_animal_task
+from app.settings import Settings
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+settings = Settings()
 
 # In-memory storage
-PACKS: list[Pack] = []
-PACK_INDEX = {}
-WOLF_INDEX = {}
-COLLAR_INDEX = {}
-
-background_tasks = []
+ANIMALS: dict[str, Animal] = {}
+REMOVED_ANIMALS: dict[str, Animal] = {}
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-    """Initialize the lifespan of the FastAPI application"""
-    global PACKS, PACK_INDEX, WOLF_INDEX, COLLAR_INDEX
-    PACKS = initialize_packs()
-    for pack in PACKS:
-        PACK_INDEX[pack.id] = pack
-        for wolf in pack.members:
-            WOLF_INDEX[wolf.id] = wolf
-            COLLAR_INDEX[wolf.collar.id] = wolf.collar
+    global ANIMALS, REMOVED_ANIMALS
 
-    task = asyncio.create_task(update_packs_minutely(PACKS))
-    background_tasks.append(task)
-    yield
+    move_task = asyncio.create_task(move_animal_task(ANIMALS))
+    lifecycle_task = asyncio.create_task(
+        lifecycle_animal_update(ANIMALS, REMOVED_ANIMALS)
+    )
+
+    try:
+        yield  # App runs here
+    finally:
+        # Cleanup happens here
+        move_task.cancel()
+        lifecycle_task.cancel()
+        await asyncio.gather(move_task, lifecycle_task, return_exceptions=True)

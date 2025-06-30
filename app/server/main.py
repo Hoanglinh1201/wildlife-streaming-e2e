@@ -12,4 +12,4 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 app = FastAPI(lifespan=lifespan)
-app.include_router(router, prefix="/api/v1", tags=["packs", "wolves", "collars"])
+app.include_router(router)

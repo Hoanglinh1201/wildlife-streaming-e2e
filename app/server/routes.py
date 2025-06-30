@@ -1,47 +1,56 @@
+# app/routes/animal.py
+
+from datetime import datetime
+from typing import Any
+
 from fastapi import APIRouter, HTTPException
 
-from app.model.collar import Collar
-from app.model.pack import Pack
-from app.model.wolf import Wolf
+from app.model.animal import Animal
+from app.model.tracker import Tracker
+from app.server.lifespan import ANIMALS, REMOVED_ANIMALS
 
-# In-memory storage
-from app.server.lifespan import COLLAR_INDEX, PACK_INDEX, PACKS, WOLF_INDEX
-
-router = APIRouter()
+router = APIRouter(prefix="/animals", tags=["Animals"])
 
 
-# --- 1. Get list of packs ---
-@router.get("/packs")
-def list_packs() -> list[str]:
-    """Retrieve a list of all pack IDs."""
-    return list(PACK_INDEX.keys())  # ← return a list, not a dict
+@router.get("/live", response_model=list[str])
+def list_live_animal_ids() -> list[str]:
+    """Return all currently alive animal IDs."""
+    return list(ANIMALS.keys())
 
 
-# --- 2. Get pack by ID---
-@router.get("/packs/{pack_id}", response_model=Pack)
-def get_pack(pack_id: str) -> Pack:
-    """Retrieve a pack by its unique ID."""
-    pack = next((p for p in PACKS if p.id == pack_id), None)
-    if not pack:
-        raise HTTPException(status_code=404, detail="Pack not found")
-    return pack
+@router.get("/dead", response_model=list[str])
+def list_dead_animal_ids() -> list[str]:
+    """Return all deceased animal IDs."""
+    return list(REMOVED_ANIMALS.keys())
 
 
-# --- 4. Get wolf by ID ---
-@router.get("/wolves/{wolf_id}", response_model=Wolf)
-def get_wolf(wolf_id: str) -> Wolf:
-    """Retrieve a wolf by its unique ID."""
-    wolf = WOLF_INDEX.get(wolf_id)
-    if not wolf:
-        raise HTTPException(status_code=404, detail="Wolf not found")
-    return wolf
+@router.get("/{animal_id}", response_model=Animal)
+def get_animal_by_id(animal_id: str) -> Animal:
+    """Return full animal data by ID."""
+    animal = ANIMALS.get(animal_id) or REMOVED_ANIMALS.get(animal_id)
+    if not animal:
+        raise HTTPException(status_code=404, detail="Animal not found")
+    return animal
 
 
-# --- 3. Get collar by ID ---
-@router.get("/collars/{collar_id}", response_model=Collar)
-def get_collar(collar_id: str) -> Collar:
-    """Retrieve a collar by its unique ID."""
-    collar = COLLAR_INDEX.get(collar_id)
-    if not collar:
-        raise HTTPException(status_code=404, detail="Collar not found")
-    return collar
+@router.get("/{animal_id}/tracker", response_model=Tracker)
+def get_tracker_by_animal_id(animal_id: str) -> Tracker:
+    """Return the tracker assigned to the animal."""
+    animal = ANIMALS.get(animal_id) or REMOVED_ANIMALS.get(animal_id)
+    if not animal:
+        raise HTTPException(status_code=404, detail="Animal not found")
+    return animal.tracker
+
+
+@router.get("/coordinates", response_model=list[dict[str, Any]])
+def get_all_animal_coordinates() -> list[dict[str, Any]]:
+    """Return all animals with their coordinates."""
+    coordinates = [
+        {
+            "id": k,
+            "coordinate": [v.tracker.lon, v.tracker.lat],
+            "timestamp": int(datetime.now().timestamp() * 1000),
+        }
+        for k, v in ANIMALS.items()
+    ]
+    return coordinates

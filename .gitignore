@@ -2,3 +2,6 @@
 .venv/
 # Python cache
 __pycache__/
+
+# Tmp
+.tmp/
