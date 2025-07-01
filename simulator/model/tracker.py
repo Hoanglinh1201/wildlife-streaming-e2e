@@ -3,7 +3,7 @@ import uuid
 
 from pydantic import BaseModel, Field
 
-from app.model.enum.tracker import TrackerStatus, TrackerType
+from simulator.model.enum.tracker import TrackerStatus, TrackerType
 
 
 class Tracker(BaseModel):

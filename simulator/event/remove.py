@@ -1,10 +1,10 @@
 import logging
 from datetime import datetime
 
-from app.model.animal import Animal
-from app.model.enum.animal import AnimalStatus
-from app.model.enum.tracker import TrackerStatus
-from app.specie_map_traits import SPECIE_TRAITS_MAP
+from simulator.model.animal import Animal
+from simulator.model.enum.animal import AnimalStatus
+from simulator.model.enum.tracker import TrackerStatus
+from simulator.specie_map_traits import SPECIE_TRAITS_MAP
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
