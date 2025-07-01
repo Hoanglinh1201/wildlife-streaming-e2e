@@ -2,8 +2,8 @@ import logging
 
 from fastapi import FastAPI
 
-from app.server.lifespan import lifespan
-from app.server.routes import router
+from simulator.server.lifespan import lifespan
+from simulator.server.routes import router
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"

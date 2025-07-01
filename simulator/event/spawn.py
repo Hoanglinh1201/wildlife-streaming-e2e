@@ -1,8 +1,8 @@
 import logging
 import random
 
-from app.model.animal import Animal
-from app.settings import Settings
+from simulator.model.animal import Animal
+from simulator.settings import Settings
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
