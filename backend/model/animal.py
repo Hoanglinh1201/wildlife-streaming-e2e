@@ -4,11 +4,11 @@ from datetime import datetime, timedelta
 from faker import Faker
 from pydantic import BaseModel, ConfigDict
 
-from simulator.model.enum.animal import AnimalIcon, AnimalStatus, AnimalType
-from simulator.model.enum.gender import Gender
-from simulator.model.enum.species import Species
-from simulator.model.tracker import Tracker
-from simulator.specie_map_traits import SPECIE_TRAITS_MAP
+from backend.model.enum.animal import AnimalIcon, AnimalStatus, AnimalType
+from backend.model.enum.gender import Gender
+from backend.model.enum.species import Species
+from backend.model.tracker import Tracker
+from backend.specie_map_traits import SPECIE_TRAITS_MAP
 
 faker = Faker()
 

@@ -2,10 +2,10 @@ import logging
 import math
 import random
 
-from simulator.model.animal import Animal
-from simulator.model.enum.animal import AnimalStatus
-from simulator.settings import Settings
-from simulator.event.spawn import spawn_animal
+from backend.event.spawn import spawn_animal
+from backend.model.animal import Animal
+from backend.model.enum.animal import AnimalStatus
+from backend.settings import Settings
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
