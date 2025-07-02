@@ -28,7 +28,7 @@ services:
     depends_on:
       - db
 
-  simulator:
+  backend:
     build:
       context: .
       dockerfile: Dockerfile

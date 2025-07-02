@@ -1,7 +1,7 @@
 .PHONY: build start stop restart restart-build logs smoke_test_db
 
 # Define which services (besides db) to start
-OTHER_SERVICES := simulator pgadmin
+OTHER_SERVICES := backend pgadmin
 
 ## build: rebuild the Docker images
 build:
@@ -30,7 +30,7 @@ logs:
 smoke_test_db:
 	docker compose down -v
 	docker compose up -d db
-	docker compose up -d simulator
-	docker compose exec simulator \
+	docker compose up -d backend
+	docker compose exec backend \
 	  python -m backend.db.db_init
 	docker compose down -v
