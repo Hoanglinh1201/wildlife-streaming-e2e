@@ -1,9 +1,9 @@
 import logging
 from datetime import datetime
 
-from backend.model.animal import Animal
-from backend.model.enum.animal import AnimalStatus
-from backend.model.enum.tracker import TrackerStatus
+from backend.simulator.model.animal import Animal
+from backend.simulator.model.enum.animal import AnimalStatus
+from backend.simulator.model.enum.tracker import TrackerStatus
 from backend.specie_map_traits import SPECIE_TRAITS_MAP
 
 logging.basicConfig(level=logging.INFO)

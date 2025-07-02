@@ -1,8 +1,8 @@
 import asyncio
 
-from backend.event.move import move_animal
-from backend.model.animal import Animal
 from backend.settings import Settings
+from backend.simulator.event.move import move_animal
+from backend.simulator.model.animal import Animal
 
 settings = Settings()
 

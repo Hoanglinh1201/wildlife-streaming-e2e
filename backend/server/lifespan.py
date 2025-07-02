@@ -5,10 +5,10 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from backend.model.animal import Animal
 from backend.server.background.lifecycle_animal_update import lifecycle_animal_update
 from backend.server.background.move_update import move_animal_task
 from backend.settings import Settings
+from backend.simulator.model.animal import Animal
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

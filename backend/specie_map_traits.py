@@ -1,6 +1,6 @@
-from backend.model.enum.animal import AnimalIcon, AnimalType
-from backend.model.enum.species import Species
-from backend.model.specie_traits import SpecieTrait
+from backend.simulator.model.enum.animal import AnimalIcon, AnimalType
+from backend.simulator.model.enum.species import Species
+from backend.simulator.model.specie_traits import SpecieTrait
 
 SPECIE_TRAITS_MAP: dict[Species, SpecieTrait] = {
     Species.ELEPHANT: SpecieTrait(

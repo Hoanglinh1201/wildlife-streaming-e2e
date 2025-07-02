@@ -1,11 +1,11 @@
 import asyncio
 import logging
 
-from backend.event.remove import check_and_remove_animal
-from backend.event.spawn import spawn_animal
-from backend.model.animal import Animal
-from backend.model.enum.animal import AnimalStatus
 from backend.settings import Settings
+from backend.simulator.event.remove import check_and_remove_animal
+from backend.simulator.event.spawn import spawn_animal
+from backend.simulator.model.animal import Animal
+from backend.simulator.model.enum.animal import AnimalStatus
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
