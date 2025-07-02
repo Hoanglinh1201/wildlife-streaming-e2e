@@ -10,7 +10,8 @@ build:
 ## start: start the Docker containers
 start-db:
 	docker compose up -d --wait db
-start:
+
+start: start-db
 	start-db
 	docker compose up -d $(OTHER_SERVICES)
 
@@ -27,9 +28,7 @@ restart-build: stop build start
 logs:
 	docker compose logs -f
 
-smoke_test_db:
-	docker compose down -v
-	docker compose up -d db
+smoke_test_db: start-db
 	docker compose up -d backend
 	docker compose exec backend \
 	  python -m backend.db.db_init
