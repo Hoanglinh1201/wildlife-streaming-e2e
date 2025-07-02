@@ -1,12 +1,18 @@
-.PHONY: build start stop restart restart-build logs
+.PHONY: build start stop restart restart-build logs smoke_test_db
+
+# Define which services (besides db) to start
+OTHER_SERVICES := simulator pgadmin
 
 ## build: rebuild the Docker images
 build:
 	docker compose build --no-cache
 
 ## start: start the Docker containers
+start-db:
+	docker compose up -d --wait db
 start:
-	docker compose up -d
+	start-db
+	docker compose up -d $(OTHER_SERVICES)
 
 ## stop: stop the Docker containers
 stop:
@@ -16,7 +22,15 @@ stop:
 restart: stop start
 
 ## restart-build: rebuild the Docker images and restart the containers
-restart-build : stop build start
+restart-build: stop build start
 
 logs:
 	docker compose logs -f
+
+smoke_test_db:
+	docker compose down -v
+	docker compose up -d db
+	docker compose up -d simulator
+	docker compose exec simulator \
+	  python -m backend.db.db_init
+	docker compose down -v
