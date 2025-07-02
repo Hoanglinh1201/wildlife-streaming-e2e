@@ -5,7 +5,7 @@ from typing import Any
 
 from fastapi import APIRouter, HTTPException
 
-from simulator.server.lifespan import ANIMALS, REMOVED_ANIMALS
+from backend.server.lifespan import ANIMALS, REMOVED_ANIMALS
 
 router = APIRouter()
 

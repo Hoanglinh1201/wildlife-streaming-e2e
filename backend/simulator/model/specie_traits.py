@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from simulator.model.enum.animal import AnimalIcon, AnimalType
+from backend.simulator.model.enum.animal import AnimalIcon, AnimalType
 
 
 class SpecieTrait(BaseModel):

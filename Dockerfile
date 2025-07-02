@@ -28,4 +28,4 @@ ENV PATH="/app/.venv/bin:$PATH"
 # Reset the entrypoint, don't invoke `uv`
 ENTRYPOINT []
 
-CMD ["uvicorn", "simulator.server.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "backend.server.main:app", "--host", "0.0.0.0", "--port", "8000"]
