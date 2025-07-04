@@ -1,65 +1,72 @@
-# app/routes/animal.py
+# simulator/backend/api/routes_animals.py
 
-from datetime import datetime
-from typing import Any
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy.orm import Session, joinedload
 
-from backend.server.lifespan import ANIMALS, REMOVED_ANIMALS
+from backend.db.db_manage import get_session
+from backend.db.tables import AnimalDB, TrackerDB, TrackingLogDB
+from backend.models.animal import Animal
+from backend.models.tracker import Tracker, TrackingLog
 
 router = APIRouter()
+db_dep = Depends(get_session)
 
 
-@router.get("/live", response_model=list[str])
-def list_live_animal_ids() -> list[str]:
-    """Return all currently alive animal IDs."""
-    return list(ANIMALS.keys())
+@router.get("/animals/{animal_id}", response_model=Animal)
+def get_animal_by_id(
+    animal_id: str,
+    db: Session = db_dep,
+) -> Animal:
+    """
+    Retrieve a single Animal by its ID, including its Tracker.
+    """
+    orm_animal = (
+        db.query(AnimalDB)
+        .options(joinedload(AnimalDB.tracker))
+        .filter(AnimalDB.id == animal_id)
+        .one_or_none()
+    )
+    if not orm_animal:
+        raise HTTPException(status_code=404, detail="Animal not found")
+    # Pydantic v2:
+    return Animal.model_validate(orm_animal)
 
 
-@router.get("/dead", response_model=list[str])
-def list_dead_animal_ids() -> list[str]:
-    """Return all deceased animal IDs."""
-    return list(REMOVED_ANIMALS.keys())
+@router.get("/trackers/{tracker_id}", response_model=Tracker)
+def get_tracker_by_id(
+    tracker_id: str,
+    db: Session = db_dep,
+) -> Tracker:
+    """
+    Retrieve a single Tracker by its ID.
+    """
+    orm_tracker = db.query(TrackerDB).filter(TrackerDB.id == tracker_id).one_or_none()
+    if not orm_tracker:
+        raise HTTPException(status_code=404, detail="Tracker not found")
+    return Tracker.model_validate(orm_tracker)
 
 
-@router.get("/coordinates", response_model=list[dict[str, Any]])
-def get_all_animal_coordinates() -> list[dict[str, Any]]:
-    """Return all animals with their coordinates."""
-    coordinates = [
-        {
-            "animal_id": k,
-            "coordinate": [v.tracker.lon, v.tracker.lat],
-            "timestamp": int(datetime.now().timestamp() * 1000),
-        }
-        for k, v in ANIMALS.items()
-    ]
-    return coordinates
-
-
-@router.get("/tracking_metadata", response_model=list[dict[str, Any]])
-def get_tracking_metadata() -> list[dict[str, Any]]:
-    """Return metadata for all animals."""
-    try:
-        return [
-            {
-                "animal_id": k,
-                "type": v.animal_type.value,
-                "species": v.species.value,
-                "icon": v.icon.value,
-                "born_at": v.born_at.isoformat(),
-                "age": v.age,
-                "gender": v.gender,
-                "length_cm": v.length_cm,
-                "weight_kg": v.weight_kg,
-                "tracker_id": v.tracker.id,
-                "tracker_type": v.tracker.type.value,
-                "tracker_battery": v.tracker.battery_level,
-                "tracker_status": v.tracker.status.value,
-            }
-            for k, v in ANIMALS.items()
-        ]
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Error retrieving tracking metadata: {e!s}",
-        ) from e
+@router.get(
+    "/animals/{animal_id}/tracking-logs",
+    response_model=list[TrackingLog],
+)
+def get_latest_tracking_logs(
+    tracker_id: str,
+    limit: int = Query(10, gt=0, le=100, description="Max number of logs to return"),
+    db: Session = db_dep,
+) -> list[TrackingLog]:
+    """
+    Return the most recent `limit` tracking logs for a given animal, ordered newest-first.
+    """
+    logs = (
+        db.query(TrackingLogDB)
+        .filter(TrackingLogDB.tracker_id == tracker_id)
+        .order_by(TrackingLogDB.timestamp.desc())
+        .limit(limit)
+        .all()
+    )
+    if not logs:
+        # If no logs exist, you can choose to return [] or 404; here we return empty list
+        return []
+    return [TrackingLog.model_validate(log) for log in logs]

@@ -16,11 +16,11 @@ class Settings(BaseSettings):
     NP_AREA: float = 1150.0  # Area in square kilometers
 
     # LIMITS
-    ANIMAL_LIMIT: int = 1  # Maximum number of animals in the park
+    ANIMAL_LIMIT: int = 50  # Maximum number of animals in the park
 
-    # Spawn
-    SPAWN_INTERVAL_SECONDS: int = 60  # Spawn animals every seconds
-    SPAWN_NR: int = 1  # Number of animals to spawn each time
+    # Lifecycle
+    LIFECYCLE_UPDATE_INTERVAL: int = 60  # Spawn animals every seconds
+    SPAWN_NR: int = 5  # Number of animals to spawn each time
 
     # Move
     MOVE_DELTA: float = 0.0005  # Delta for moving animals

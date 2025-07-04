@@ -19,8 +19,8 @@ class TrackerDB(Base):
     type = Column(String, nullable=False)
     status = Column(String, nullable=False)
 
-    coordinates = relationship("CoordinateDB", back_populates="trackers")
-    animals = relationship("AnimalDB", back_populates="trackers", uselist=False)
+    tracking_logs = relationship("TrackingLogDB", back_populates="tracker")
+    animal = relationship("AnimalDB", back_populates="tracker", uselist=False)
 
 
 class AnimalDB(Base):
@@ -39,11 +39,11 @@ class AnimalDB(Base):
     weight_kg = Column(Float, nullable=True)
     tracker_id = Column(String, ForeignKey("trackers.id"), nullable=False, unique=True)
 
-    trackers = relationship("TrackerDB", back_populates="animals")
+    tracker = relationship("TrackerDB", back_populates="animal")
 
 
-class CoordinateDB(Base):
-    __tablename__ = "coordinates"
+class TrackingLogDB(Base):
+    __tablename__ = "tracking_logs"
 
     id = Column(String, primary_key=True)
     tracker_id = Column(String, ForeignKey("trackers.id"), nullable=False)
@@ -52,12 +52,12 @@ class CoordinateDB(Base):
     battery_level = Column(Float, nullable=False)
     timestamp = Column(BigInteger, nullable=False)
 
-    trackers = relationship("TrackerDB", back_populates="coordinates")
+    tracker = relationship("TrackerDB", back_populates="tracking_logs")
 
 
 class EventDB(Base):
     __tablename__ = "events"
 
     id = Column(String, primary_key=True)
-    event_type = Column(String, nullable=False)
-    event_data = Column(JSONB, nullable=True)
+    type = Column(String, nullable=False)
+    detail = Column(JSONB, nullable=True)
