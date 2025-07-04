@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
+from backend.db.db_manage import init_db
 from backend.settings import Settings
 from backend.simulator.cycles import move_cycle, spawn_cycle
 
@@ -16,8 +17,9 @@ settings = Settings()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-    move_task = asyncio.create_task(move_cycle())
+    init_db()
     spawn_task = asyncio.create_task(spawn_cycle())
+    move_task = asyncio.create_task(move_cycle())
 
     try:
         yield  # App runs here
@@ -25,4 +27,4 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         # Cleanup happens here
         move_task.cancel()
         spawn_task.cancel()
-        await asyncio.gather(move_task, spawn_task, return_exceptions=True)
+        await asyncio.gather(spawn_task, return_exceptions=True)

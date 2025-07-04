@@ -53,17 +53,8 @@ async def move_cycle() -> None:
                 for a in moved_animals
             ]
 
-            if event_to_insert:
-                insert_event(db, event_to_insert)
-                logger.info(
-                    f"Inserted {len(event_to_insert)} move events into the database."
-                )
-
-            if tracking_log_to_insert:
-                insert_tracking_log(db, tracking_log_to_insert)
-                logger.info(
-                    f"Inserted {len(tracking_log_to_insert)} tracking logs into the database."
-                )
+            insert_event(db, event_to_insert)
+            insert_tracking_log(db, tracking_log_to_insert)
 
         logger.info("Animal movement cycle completed.")
         await asyncio.sleep(settings.MOVE_INTERVAL_SECONDS)
@@ -91,61 +82,80 @@ async def spawn_cycle() -> None:
             # Remove due to age
             age_check = [a if reach_max_age(a) else None for a in animals]
             to_remove: list[Animal] = [remove(a) for a in age_check if a is not None]
+            logger.info(
+                f"Found {len(to_remove)} animals that reached max age and will be removed."
+            )
 
             # Spawn new animals if below the limit
-            live_animals_amount = len(animals) - len(to_remove)
+            live_count: int = len(animals) - len(to_remove)
+            logger.info(f"Current live animals: {live_count}/{settings.ANIMAL_LIMIT}")
             to_spawn: list[Animal] = []
-            if live_animals_amount < settings.ANIMAL_LIMIT:
-                spawn_count = settings.ANIMAL_LIMIT - live_animals_amount
+            limit: int = settings.ANIMAL_LIMIT
+            spawn_count: int = min(
+                settings.ANIMAL_LIMIT - live_count, settings.SPAWN_NR
+            )
+
+            if live_count < limit:
+                logger.info(
+                    f"Current live animals {live_count} is below the limit {settings.ANIMAL_LIMIT}. "
+                    f"Spawning up to {spawn_count} new animals."
+                )
                 for _ in range(spawn_count):
+                    logger.info("Spawning new animal...")
                     new_animal = spawn()
                     to_spawn.append(new_animal)
 
+                logger.info(
+                    f"Spawned {len(to_spawn)} new animals, current live animals: {live_count + len(to_spawn)}"
+                )
+
             # Records to db
-            animal_to_update.extend(to_spawn + to_remove)
+            animal_to_update.extend(to_remove)
+            animal_to_update.extend(to_spawn)
+
             tracker_to_update = [a.tracker for a in animal_to_update]
 
-            event_to_insert.extend(
-                Event(
-                    type=EventType.REMOVE,
-                    detail={"animal_id": a.id, "reason": "reached max age"},
-                )
-                for a in to_remove
+            logger.info(
+                f"Preparing to update {len(animal_to_update)} animals and trackers in the database."
             )
 
             event_to_insert.extend(
-                Event(
-                    type=EventType.SPAWN,
-                    detail={"animal_id": a.id, "species": a.species},
-                )
-                for a in to_spawn
+                [
+                    Event(
+                        type=EventType.REMOVE,
+                        detail={"animal_id": a.id, "reason": "reached max age"},
+                    )
+                    for a in to_remove
+                ]
+            )
+
+            event_to_insert.extend(
+                [
+                    Event(
+                        type=EventType.SPAWN,
+                        detail={"animal_id": a.id, "species": a.species},
+                    )
+                    for a in to_spawn
+                ]
             )
 
             tracking_log_to_insert.extend(
-                TrackingLog(
-                    tracker_id=a.tracker.id,
-                    lat=a.tracker.lat,
-                    lon=a.tracker.lon,
-                    battery_level=a.tracker.battery_level,
-                )
-                for a in to_spawn
+                [
+                    TrackingLog(
+                        tracker_id=a.tracker.id,
+                        lat=a.tracker.lat,
+                        lon=a.tracker.lon,
+                        battery_level=a.tracker.battery_level,
+                    )
+                    for a in to_spawn
+                ]
             )
 
             # Perform database operations
-            if animal_to_update:
-                upsert_animals(db, animal_to_update)
-                upsert_tracker(db, tracker_to_update)
-                logger.info(
-                    f"Updated {len(animal_to_update)} animals and {len(tracker_to_update)} trackers."
-                )
-
-            if event_to_insert:
-                insert_event(db, event_to_insert)
-                logger.info(f"Inserted {len(event_to_insert)} events.")
-
-            if tracking_log_to_insert:
-                insert_tracking_log(db, tracking_log_to_insert)
-                logger.info(f"Inserted {len(tracking_log_to_insert)} tracking logs.")
+            upsert_tracker(db, tracker_to_update)
+            upsert_animals(db, animal_to_update)
+            insert_event(db, event_to_insert)
+            insert_tracking_log(db, tracking_log_to_insert)
 
         logger.info("Animal lifecycle update completed.")
         await asyncio.sleep(settings.LIFECYCLE_UPDATE_INTERVAL)

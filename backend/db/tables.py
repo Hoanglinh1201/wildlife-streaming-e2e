@@ -31,6 +31,9 @@ class AnimalDB(Base):
     status = Column(String, nullable=False)
     icon = Column(String, nullable=True)
     species = Column(String, nullable=False)
+    animal_type = Column(
+        String, nullable=False
+    )  # This field is not used in the current implementation
     gender = Column(String, nullable=False)
     age = Column(Float, nullable=False)
     born_at = Column(DateTime, nullable=False)

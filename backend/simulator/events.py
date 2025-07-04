@@ -1,8 +1,7 @@
 import random
 from datetime import datetime
 
-from backend.models.animal import Animal, AnimalStatus
-from backend.models.specie_map_traits import SPECIE_TRAITS_MAP
+from backend.models.animal import SPECIE_TRAITS_MAP, Animal, AnimalStatus
 from backend.models.tracker import TrackerStatus
 from backend.settings import Settings
 from backend.simulator.geo import (
