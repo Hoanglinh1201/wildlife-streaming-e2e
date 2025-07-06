@@ -1,4 +1,4 @@
-from sqlalchemy import BigInteger, Column, DateTime, Float, ForeignKey, String
+from sqlalchemy import Column, DateTime, Float, ForeignKey, String
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, relationship
 
@@ -40,7 +40,7 @@ class AnimalDB(Base):
     deceased_at = Column(DateTime, nullable=True)
     length_cm = Column(Float, nullable=True)
     weight_kg = Column(Float, nullable=True)
-    tracker_id = Column(String, ForeignKey("trackers.id"), nullable=False, unique=True)
+    tracker_id = Column(String, ForeignKey("trackers.id"), nullable=False)
 
     tracker = relationship("TrackerDB", back_populates="animal")
 
@@ -50,10 +50,10 @@ class TrackingLogDB(Base):
 
     id = Column(String, primary_key=True)
     tracker_id = Column(String, ForeignKey("trackers.id"), nullable=False)
-    latitude = Column(Float, nullable=False)
-    longitude = Column(Float, nullable=False)
+    lat = Column(Float, nullable=False)
+    lon = Column(Float, nullable=False)
     battery_level = Column(Float, nullable=False)
-    timestamp = Column(BigInteger, nullable=False)
+    timestamp = Column(DateTime, nullable=False)
 
     tracker = relationship("TrackerDB", back_populates="tracking_logs")
 
@@ -64,3 +64,4 @@ class EventDB(Base):
     id = Column(String, primary_key=True)
     type = Column(String, nullable=False)
     detail = Column(JSONB, nullable=True)
+    timestamp = Column(DateTime, nullable=False)

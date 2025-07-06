@@ -50,7 +50,7 @@ class TrackingLog(BaseModel):
         timestamp (int): Timestamp of the log entry in milliseconds since epoch.
     """
 
-    id: str = Field(default_factory=lambda: uuid.uuid4().hex)
+    id: str
     tracker_id: str
     lat: float
     lon: float

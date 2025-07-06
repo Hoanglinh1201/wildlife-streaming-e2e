@@ -7,7 +7,8 @@ from fastapi import FastAPI
 
 from backend.db.db_manage import init_db
 from backend.settings import Settings
-from backend.simulator.cycles import move_cycle, spawn_cycle
+from backend.simulator.move_cycle import move_cycle
+from backend.simulator.spawn_cycle import spawn_cycle
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

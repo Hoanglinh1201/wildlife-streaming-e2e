@@ -1,7 +1,6 @@
 from datetime import datetime
 from enum import Enum
 from typing import Any
-from uuid import uuid4
 
 from pydantic import BaseModel, Field
 
@@ -26,7 +25,7 @@ class Event(BaseModel):
         description (str): Description of the event.
     """
 
-    id: str = Field(default_factory=lambda: uuid4().hex)
+    id: str
     type: EventType
     detail: dict[str, Any] | None = (
         None  # Use a dictionary to store event-specific details

@@ -17,7 +17,7 @@ start-dev:
 
 ## stop: stop the Docker containers
 stop:
-	docker compose down
+	docker compose down -v
 
 ## restart: restart the Docker containers
 restart: stop start

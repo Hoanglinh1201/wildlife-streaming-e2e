@@ -38,7 +38,7 @@ def upsert_animals(db: Session, animals: list[Animal]) -> None:
 
     ins = insert(AnimalDB).values(rows)
     stmt = ins.on_conflict_do_update(
-        index_elements=["id"],
+        constraint="animals_pkey",
         set_={
             "tracker_id": ins.excluded.tracker_id,
             "name": ins.excluded.name,
@@ -61,7 +61,7 @@ def upsert_tracker(db: Session, trackers: list[Tracker]) -> None:
     rows = [t.model_dump(exclude={"lat", "lon", "battery_level"}) for t in trackers]
     ins = insert(TrackerDB).values(rows)
     stmt = ins.on_conflict_do_update(
-        index_elements=["id"],
+        index_elements=[TrackerDB.id],
         set_={
             "type": ins.excluded.type,
             "status": ins.excluded.status,
