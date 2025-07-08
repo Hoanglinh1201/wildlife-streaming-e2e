@@ -125,7 +125,7 @@ services:
       db:
         condition: service_healthy
 
-  register-connector:
+  register-debezium-connector:
     image: alpine:latest
     depends_on:
       debezium:
