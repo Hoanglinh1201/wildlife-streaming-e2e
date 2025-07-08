@@ -119,9 +119,6 @@ services:
         - http://localhost:8083/
       interval: 10s
       retries: 5
-    volumes:
-      - ./scripts/register-connector.sh:/kafka/register-connector.sh:ro
-      - ./backend/kafka-connector.template.json:/kafka/connector-template.json:ro
     depends_on:
       redpanda:
         condition: service_healthy
@@ -136,8 +133,8 @@ services:
     env_file:
       - .env
     volumes:
-      - ./scripts/register-connector.sh:/kafka/register-connector.sh:ro
-      - ./scripts/kafka-connector.template.json:/kafka/connector-template.json:ro
+      - ./backend/scripts/register-connector.sh:/kafka/register-connector.sh:ro
+      - ./backend/scripts/kafka-connector.template.json:/kafka/connector-template.json:ro
     entrypoint: ["/bin/sh", "-c", "/kafka/register-connector.sh"]
 
   debezium-ui:
