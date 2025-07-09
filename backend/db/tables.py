@@ -1,4 +1,4 @@
-from sqlalchemy import BigInteger, Column, DateTime, Float, ForeignKey, String
+from sqlalchemy import Column, DateTime, Float, ForeignKey, String
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, relationship
 
@@ -19,8 +19,8 @@ class TrackerDB(Base):
     type = Column(String, nullable=False)
     status = Column(String, nullable=False)
 
-    coordinates = relationship("CoordinateDB", back_populates="trackers")
-    animals = relationship("AnimalDB", back_populates="trackers", uselist=False)
+    tracking_logs = relationship("TrackingLogDB", back_populates="tracker")
+    animal = relationship("AnimalDB", back_populates="tracker", uselist=False)
 
 
 class AnimalDB(Base):
@@ -31,33 +31,37 @@ class AnimalDB(Base):
     status = Column(String, nullable=False)
     icon = Column(String, nullable=True)
     species = Column(String, nullable=False)
+    animal_type = Column(
+        String, nullable=False
+    )  # This field is not used in the current implementation
     gender = Column(String, nullable=False)
     age = Column(Float, nullable=False)
     born_at = Column(DateTime, nullable=False)
     deceased_at = Column(DateTime, nullable=True)
     length_cm = Column(Float, nullable=True)
     weight_kg = Column(Float, nullable=True)
-    tracker_id = Column(String, ForeignKey("trackers.id"), nullable=False, unique=True)
+    tracker_id = Column(String, ForeignKey("trackers.id"), nullable=False)
 
-    trackers = relationship("TrackerDB", back_populates="animals")
+    tracker = relationship("TrackerDB", back_populates="animal")
 
 
-class CoordinateDB(Base):
-    __tablename__ = "coordinates"
+class TrackingLogDB(Base):
+    __tablename__ = "tracking_logs"
 
     id = Column(String, primary_key=True)
     tracker_id = Column(String, ForeignKey("trackers.id"), nullable=False)
-    latitude = Column(Float, nullable=False)
-    longitude = Column(Float, nullable=False)
+    lat = Column(Float, nullable=False)
+    lon = Column(Float, nullable=False)
     battery_level = Column(Float, nullable=False)
-    timestamp = Column(BigInteger, nullable=False)
+    timestamp = Column(DateTime, nullable=False)
 
-    trackers = relationship("TrackerDB", back_populates="coordinates")
+    tracker = relationship("TrackerDB", back_populates="tracking_logs")
 
 
 class EventDB(Base):
     __tablename__ = "events"
 
     id = Column(String, primary_key=True)
-    event_type = Column(String, nullable=False)
-    event_data = Column(JSONB, nullable=True)
+    type = Column(String, nullable=False)
+    detail = Column(JSONB, nullable=True)
+    timestamp = Column(DateTime, nullable=False)

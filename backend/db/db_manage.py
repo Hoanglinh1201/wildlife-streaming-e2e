@@ -40,12 +40,15 @@ def get_session() -> Iterator[Session]:
     local_session = sessionmaker(bind=engine)
     session = local_session()
     try:
+        logger.info("→ Starting a new database session...")
         yield session
         session.commit()
-    except:
+    except Exception:
+        logger.exception("⚠️ Error in DB session, rolling back.")
         session.rollback()
         raise
     finally:
+        logger.info("✔ Closing the database session.")
         session.close()
 
 
