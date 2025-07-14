@@ -1,0 +1,14 @@
+FROM debezium/connect:2.6
+
+USER root
+
+# Install required tools
+RUN microdnf install -y curl unzip && microdnf clean all
+
+# Install Clickhouse Sink Connector
+RUN curl -L https://github.com/ClickHouse/clickhouse-kafka-connect/releases/download/v1.3.2/clickhouse-kafka-connect-v1.3.2.zip \
+    -o /tmp/clickhouse-connector.zip && \
+    unzip /tmp/clickhouse-connector.zip -d /kafka/connect && \
+    rm /tmp/clickhouse-connector.zip
+
+USER 1001

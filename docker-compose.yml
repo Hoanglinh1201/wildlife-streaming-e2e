@@ -1,13 +1,8 @@
 services:
   db:
+    container_name: backend-db
     image: postgres:15
     restart: always
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
-      interval: 10s
-      retries: 5
-      start_period: 30s
-      timeout: 10s
     command:
       - postgres
       - -c
@@ -20,23 +15,37 @@ services:
       - "${POSTGRES_PORT}:5432"
     volumes:
       - backend-db-data:/var/lib/postgresql/data
-      - ./scripts/init-debezium-user.sh:/docker-entrypoint-initdb.d/init-debezium-user.sh:ro
+      - ./backend/scripts/init-debezium-user.sh:/docker-entrypoint-initdb.d/init-debezium-user.sh:ro
     env_file:
       - .env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
 
   adminer:
+    container_name: adminer
     image: adminer:latest
     restart: always
-    depends_on:
-      db:
-        condition: service_healthy
     ports:
       - "8080:8080"
     environment:
       # Tell Adminer which server to connect to by default
       ADMINER_DEFAULT_SERVER: db
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
 
   backend:
+    container_name: backend
     build:
       context: .
       dockerfile: backend/Dockerfile.backend
@@ -61,6 +70,7 @@ services:
         condition: service_healthy
 
   redpanda:
+    container_name: redpanda-broker
     image: redpandadata/redpanda:latest
     restart: always
     ports:
@@ -94,7 +104,10 @@ services:
         condition: service_healthy
 
   debezium:
-    image: debezium/connect:2.6
+    container_name: debezium
+    build:
+      context: .
+      dockerfile: kafka/Dockerfile.debezium
     restart: always
     env_file:
       - .env
@@ -122,31 +135,10 @@ services:
     depends_on:
       redpanda:
         condition: service_healthy
-      db:
-        condition: service_healthy
 
-  register-debezium-connector:
-    image: alpine:latest
-    depends_on:
-      debezium:
-        condition: service_healthy
-    env_file:
-      - .env
-    volumes:
-      - ./backend/scripts/register-connector.sh:/kafka/register-connector.sh:ro
-      - ./backend/scripts/kafka-connector.template.json:/kafka/connector-template.json:ro
-    entrypoint: ["/bin/sh", "-c", "/kafka/register-connector.sh"]
-
-  debezium-ui:
-    image: debezium/debezium-ui:2.1
-    ports:
-      - "8081:8080"
-    environment:
-      KAFKA_CONNECT_URIS: http://debezium:8083
-    depends_on:
-      - debezium
 
   redpanda-console:
+    container_name: redpanda-console
     image: docker.redpanda.com/redpandadata/console:latest
     ports:
       - "8082:8080"
@@ -158,6 +150,74 @@ services:
         condition: service_healthy
       debezium:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+
+
+
+  debezium-ui:
+    container_name: debezium-ui
+    image: debezium/debezium-ui:2.1
+    ports:
+      - "8081:8080"
+    environment:
+      KAFKA_CONNECT_URIS: http://debezium:8083
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+    depends_on:
+      - debezium
+  clickhouse:
+    container_name: clickhouse
+    image: clickhouse/clickhouse-server:latest
+    restart: always
+    ports:
+      - "8123:8123" # HTTP port
+      - "9000:9000" # Native port
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    volumes:
+      - clickhouse-data:/var/lib/clickhouse
+      - ./clickhouse/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8123/ping"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+    depends_on:
+      db:
+        condition: service_healthy
+
+  kafka-connector-registry:
+    container_name: kafka-connector-registry
+    image: alpine:latest
+    env_file:
+      - .env
+    volumes:
+      - ./kafka/scripts/register-connector.sh:/kafka/register-connector.sh:ro
+      - ./kafka/scripts/register-clickhouse-sink.sh:/kafka/register-clickhouse-sink.sh:ro
+      - ./kafka/templates/kafka-connector.template.json:/kafka/kafka-connector-template.json:ro
+      - ./kafka/templates/clickhouse-sink.template.json:/kafka/clickhouse-sink.template.json:ro
+    entrypoint:
+      - /bin/sh
+      - -c
+      - "/kafka/register-connector.sh && /kafka/register-clickhouse-sink.sh"
+    depends_on:
+      debezium:
+        condition: service_healthy
+      clickhouse:
+        condition: service_healthy
 
 volumes:
   backend-db-data:
+  clickhouse-data:

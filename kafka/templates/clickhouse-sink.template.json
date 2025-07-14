@@ -1,0 +1,39 @@
+{
+  "name": "clickhouse-sink-cdc-__TABLE__",
+  "config": {
+    "connector.class": "com.clickhouse.kafka.connect.ClickHouseSinkConnector",
+    "tasks.max": "1",
+
+    "topics": "wildlife.public.__TABLE__",
+    "topic2TableMap": "wildlife.public.__TABLE__=cdc___TABLE__",
+
+    "hostname": "clickhouse",
+    "port": "8123",
+    "database": "landing",
+    "username": "ingestor",
+    "password": "ingestor",
+
+    "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+    "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+    "value.converter.schemas.enable": "false",
+    "behavior.on.null.values": "ignore",
+
+    "transforms": "ExtractPayload,AddMeta,DropExtras",
+
+    "transforms.ExtractPayload.type": "org.apache.kafka.connect.transforms.ExtractField$Value",
+    "transforms.ExtractPayload.field": "payload",
+
+    "transforms.AddMeta.type": "org.apache.kafka.connect.transforms.InsertField$Value",
+    "transforms.AddMeta.topic.field": "kafka_topic",
+    "transforms.AddMeta.partition.field": "kafka_partition",
+    "transforms.AddMeta.offset.field": "kafka_offset",
+
+    "transforms.DropExtras.type": "org.apache.kafka.connect.transforms.ReplaceField$Value",
+    "transforms.DropExtras.blacklist": "source,transaction,ts_ms",
+
+    "insert.mode": "insert",
+    "table.name.format": "cdc___TABLE__",
+    "auto.create": "false",
+    "auto.evolve": "false"
+  }
+}
