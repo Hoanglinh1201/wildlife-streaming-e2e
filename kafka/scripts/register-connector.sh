@@ -2,7 +2,7 @@
 set -euo pipefail
 apk add --no-cache curl gettext
 
-envsubst < /kafka/connector-template.json > /tmp/connector.json
+envsubst < /kafka/kafka-connector-template.json > /tmp/connector.json
 
 echo "Registering Debezium connector with the following configuration:"
 cat /tmp/connector.json
