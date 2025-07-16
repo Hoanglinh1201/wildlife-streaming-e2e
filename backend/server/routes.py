@@ -1,13 +1,13 @@
 # simulator/backend/api/routes_animals.py
 
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session, joinedload
 
 from backend.db.db_manage import get_session
-from backend.db.tables import AnimalDB, TrackerDB, TrackingLogDB
+from backend.db.tables import AnimalDB, TrackerDB
 from backend.models.animal import Animal
-from backend.models.tracker import Tracker, TrackingLog
+from backend.models.tracker import Tracker
 
 router = APIRouter()
 db_dep = Depends(get_session)
@@ -47,26 +47,10 @@ def get_tracker_by_id(
     return Tracker.model_validate(orm_tracker)
 
 
-@router.get(
-    "/animals/{animal_id}/tracking-logs",
-    response_model=list[TrackingLog],
-)
-def get_latest_tracking_logs(
-    tracker_id: str,
-    limit: int = Query(10, gt=0, le=100, description="Max number of logs to return"),
-    db: Session = db_dep,
-) -> list[TrackingLog]:
+# Healthcheck route
+@router.get("/health", response_model=dict[str, str])
+def health_check() -> dict[str, str]:
     """
-    Return the most recent `limit` tracking logs for a given animal, ordered newest-first.
+    Health check endpoint to verify the API is running.
     """
-    logs = (
-        db.query(TrackingLogDB)
-        .filter(TrackingLogDB.tracker_id == tracker_id)
-        .order_by(TrackingLogDB.timestamp.desc())
-        .limit(limit)
-        .all()
-    )
-    if not logs:
-        # If no logs exist, you can choose to return [] or 404; here we return empty list
-        return []
-    return [TrackingLog.model_validate(log) for log in logs]
+    return {"status": "ok", "message": "API is healthy"}

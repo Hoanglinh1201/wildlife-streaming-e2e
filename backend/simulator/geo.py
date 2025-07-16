@@ -5,6 +5,8 @@ from backend.settings import Settings
 
 settings = Settings()
 
+EARTH_RADIUS_KM = 6371.0
+
 
 def random_location_within_bounds() -> tuple[float, float]:
     """
@@ -40,21 +42,33 @@ def within_bounds(lat: float, lon: float) -> bool:
 
 
 def calculate_new_coordinates(
-    lat: float, lon: float, delta: float, direction: float
+    lat: float, lon: float, distance_km: float, bearing_deg: float
 ) -> tuple[float, float]:
     """
-    Calculates new coordinates based on the current latitude, longitude, distance to move (delta), and direction.
+    Calculates a new coordinate given distance and bearing from a starting lat/lon.
 
     Args:
-        lat (float): Current latitude.
-        lon (float): Current longitude.
-        delta (float): Distance to move in degrees.
-        direction (float): Direction in degrees.
+        lat (float): Starting latitude in degrees
+        lon (float): Starting longitude in degrees
+        distance_km (float): Distance to move in kilometers
+        bearing_deg (float): Bearing (direction) in degrees
 
     Returns:
-        tuple[float, float]: New latitude and longitude after moving.
+        (lat, lon): New latitude and longitude in degrees
     """
-    radians = math.radians(direction)
-    new_lat = lat + delta * math.cos(radians)
-    new_lon = lon + delta * math.sin(radians)
-    return new_lat, new_lon
+    lat_rad = math.radians(lat)
+    lon_rad = math.radians(lon)
+    bearing_rad = math.radians(bearing_deg)
+    delta = distance_km / EARTH_RADIUS_KM
+
+    new_lat_rad = math.asin(
+        math.sin(lat_rad) * math.cos(delta)
+        + math.cos(lat_rad) * math.sin(delta) * math.cos(bearing_rad)
+    )
+
+    new_lon_rad = lon_rad + math.atan2(
+        math.sin(bearing_rad) * math.sin(delta) * math.cos(lat_rad),
+        math.cos(delta) - math.sin(lat_rad) * math.sin(new_lat_rad),
+    )
+
+    return math.degrees(new_lat_rad), math.degrees(new_lon_rad)

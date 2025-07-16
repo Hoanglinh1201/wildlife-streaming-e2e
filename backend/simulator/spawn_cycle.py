@@ -5,14 +5,13 @@ from uuid import uuid4
 from backend.db.db_manage import get_session
 from backend.db.operations import (
     insert_event,
-    insert_tracking_log,
     select_all_live_animals,
     upsert_animals,
     upsert_tracker,
 )
 from backend.models.animal import Animal
 from backend.models.event import Event, EventType
-from backend.models.tracker import Tracker, TrackingLog
+from backend.models.tracker import Tracker
 from backend.settings import Settings
 from backend.simulator.events import reach_max_age, remove, spawn
 
@@ -36,7 +35,6 @@ async def spawn_cycle() -> None:
         animal_to_update: list[Animal] = []
         tracker_to_update: list[Tracker] = []
         event_to_insert: list[Event] = []
-        tracking_log_to_insert: list[TrackingLog] = []
 
         with get_session() as db:
             animals = select_all_live_animals(db)
@@ -86,7 +84,14 @@ async def spawn_cycle() -> None:
                     Event(
                         id=uuid4().hex,  # Generate a unique ID for the event
                         type=EventType.REMOVE,
-                        detail={"animal_id": a.id, "reason": "reached max age"},
+                        detail={
+                            "animal_id": a.id,
+                            "tracker_id": a.tracker.id,
+                            "lat": a.tracker.lat,
+                            "lon": a.tracker.lon,
+                            "battery_level": a.tracker.battery_level,
+                            "remove_reason": "Max Age Reached",
+                        },
                     )
                     for a in to_remove
                 ]
@@ -97,20 +102,13 @@ async def spawn_cycle() -> None:
                     Event(
                         id=uuid4().hex,  # Generate a unique ID for the event
                         type=EventType.SPAWN,
-                        detail={"animal_id": a.id, "species": a.species},
-                    )
-                    for a in to_spawn
-                ]
-            )
-
-            tracking_log_to_insert.extend(
-                [
-                    TrackingLog(
-                        id=uuid4().hex,  # Generate a unique ID for the tracking log
-                        tracker_id=a.tracker.id,
-                        lat=a.tracker.lat,
-                        lon=a.tracker.lon,
-                        battery_level=a.tracker.battery_level,
+                        detail={
+                            "animal_id": a.id,
+                            "tracker_id": a.tracker.id,
+                            "lat": a.tracker.lat,
+                            "lon": a.tracker.lon,
+                            "battery_level": a.tracker.battery_level,
+                        },
                     )
                     for a in to_spawn
                 ]
@@ -120,7 +118,6 @@ async def spawn_cycle() -> None:
             upsert_tracker(db, tracker_to_update)
             upsert_animals(db, animal_to_update)
             insert_event(db, event_to_insert)
-            insert_tracking_log(db, tracking_log_to_insert)
 
         logger.info("Animal lifecycle update completed.")
         await asyncio.sleep(settings.LIFECYCLE_UPDATE_INTERVAL)

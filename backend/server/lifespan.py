@@ -16,11 +16,20 @@ logger = logging.getLogger(__name__)
 settings = Settings()
 
 
+async def delay_move_cycle(delay_by_seconds: int = 5) -> None:
+    try:
+        await asyncio.sleep(delay_by_seconds)
+        await move_cycle()
+    except asyncio.CancelledError:
+        logger.info("Move cycle task was cancelled.")
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     init_db()
+
     spawn_task = asyncio.create_task(spawn_cycle())
-    move_task = asyncio.create_task(move_cycle())
+    move_task = asyncio.create_task(delay_move_cycle())
 
     try:
         yield  # App runs here

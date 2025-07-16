@@ -1,6 +1,5 @@
 import random
 import uuid
-from datetime import datetime
 from enum import Enum
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -35,26 +34,5 @@ class Tracker(BaseModel):
     battery_level: int = Field(
         default=100, description="Battery level of the tracker in percentage"
     )
-
-    model_config = ConfigDict(from_attributes=True)
-
-
-class TrackingLog(BaseModel):
-    """
-    Represents a log entry for a tracker event.
-    Attributes:
-        tracker_id (str): Unique identifier for the tracker.
-        lat (float): Latitude of the tracker's location.
-        lon (float): Longitude of the tracker's location.
-        battery_level (int): Battery level of the tracker.
-        timestamp (int): Timestamp of the log entry in milliseconds since epoch.
-    """
-
-    id: str
-    tracker_id: str
-    lat: float
-    lon: float
-    battery_level: int
-    timestamp: datetime = Field(default_factory=datetime.now)
 
     model_config = ConfigDict(from_attributes=True)
