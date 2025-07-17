@@ -1,0 +1,12 @@
+# Venv
+.venv/
+# Python cache
+__pycache__/
+
+.logs_queue/
+.telemetry/
+history/
+schedules/
+storage/
+dbt/
+.nux
