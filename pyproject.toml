@@ -5,6 +5,9 @@ description = "Project demonstrating a streaming end-to-end application for wild
 readme = "README.md"
 requires-python = ">=3.11,<3.13"
 dependencies = [
+    "dagster>=1.11.2",
+    "dagster-dbt>=0.27.2",
+    "dagster-webserver>=1.11.2",
     "dbt-clickhouse>=1.9.2",
     "faker>=37.4.0",
     "fastapi>=0.115.13",
@@ -96,3 +99,6 @@ init_forbid_extra = true
 init_typed = true
 warn_required_dynamic_aliases = true
 warn_untyped_fields = true
+
+[tool.dagster]
+module_name = "orchestrator.definitions"

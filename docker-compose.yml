@@ -223,6 +223,30 @@ services:
       debezium-ui:
         condition: service_healthy
 
+  dagster:
+    container_name: dagster
+    build:
+      context: .
+      dockerfile: orchestrator/Dockerfile.dagster
+    ports:
+      - "3000:3000" # Dagster UI port
+    environment:
+      - DAGSTER_HOME=/app/orchestrator
+      - DBT_TARGET=docker
+    volumes:
+      - ./orchestrator:/app/orchestrator
+      - ./dbt:/app/dbt
+    depends_on:
+      clickhouse:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/server_info"]
+      interval: 2s
+      retries: 3
+      start_period: 5s
+      timeout: 5s
+
+
 volumes:
   backend-db-data:
   clickhouse-data:
