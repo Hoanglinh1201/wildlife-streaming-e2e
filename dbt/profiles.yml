@@ -10,3 +10,13 @@ wildlife:
       password: transformer
       secure: false
       threads: 4
+
+    docker:
+      type: clickhouse
+      schema: staging
+      host: clickhouse
+      port: 8123
+      user: transformer
+      password: transformer
+      secure: false
+      threads: 4
