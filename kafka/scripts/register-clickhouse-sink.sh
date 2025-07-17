@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-for table in animals trackers events tracking_logs; do
+for table in animals trackers events; do
     echo "Registering CDC sink for table: $table"
 
     sed "s/__TABLE__/$table/g;" /kafka/clickhouse-sink.template.json > /tmp/clickhouse-sink-$table.json

@@ -23,5 +23,5 @@ class Settings(BaseSettings):
     SPAWN_NR: int = 5  # Number of animals to spawn each time
 
     # Move
-    MOVE_DELTA: float = 0.0005  # Delta for moving animals
+    MOVE_DELTA: float = 0.2  # Distance in km to move each animal per cycle
     MOVE_INTERVAL_SECONDS: int = 15  # Update packs every seconds

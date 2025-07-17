@@ -19,7 +19,6 @@ class TrackerDB(Base):
     type = Column(String, nullable=False)
     status = Column(String, nullable=False)
 
-    tracking_logs = relationship("TrackingLogDB", back_populates="tracker")
     animal = relationship("AnimalDB", back_populates="tracker", uselist=False)
 
 
@@ -43,19 +42,6 @@ class AnimalDB(Base):
     tracker_id = Column(String, ForeignKey("trackers.id"), nullable=False)
 
     tracker = relationship("TrackerDB", back_populates="animal")
-
-
-class TrackingLogDB(Base):
-    __tablename__ = "tracking_logs"
-
-    id = Column(String, primary_key=True)
-    tracker_id = Column(String, ForeignKey("trackers.id"), nullable=False)
-    lat = Column(Float, nullable=False)
-    lon = Column(Float, nullable=False)
-    battery_level = Column(Float, nullable=False)
-    timestamp = Column(DateTime, nullable=False)
-
-    tracker = relationship("TrackerDB", back_populates="tracking_logs")
 
 
 class EventDB(Base):

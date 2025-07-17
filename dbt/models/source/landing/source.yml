@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: landing
+    description: "Source tables for Change Data Capture (CDC) from the landing schema"
+    schema: landing
+    tables:
+      - name: cdc_animals
+      - name: cdc_trackers
+      - name: cdc_events

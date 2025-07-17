@@ -20,10 +20,10 @@ services:
       - .env
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
-      interval: 10s
-      retries: 5
-      start_period: 30s
-      timeout: 10s
+      interval: 2s
+      retries: 3
+      start_period: 5s
+      timeout: 5s
 
   adminer:
     container_name: adminer
@@ -35,14 +35,13 @@ services:
       # Tell Adminer which server to connect to by default
       ADMINER_DEFAULT_SERVER: db
     depends_on:
-      db:
-        condition: service_healthy
+      - db
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/"]
-      interval: 10s
-      retries: 5
-      start_period: 30s
-      timeout: 10s
+      interval: 2s
+      retries: 3
+      start_period: 5s
+      timeout: 5s
 
   backend:
     container_name: backend
@@ -68,6 +67,12 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${BACKEND_PORT}/health"]
+      interval: 2s
+      retries: 3
+      start_period: 5s
+      timeout: 5s
 
   redpanda:
     container_name: redpanda-broker
@@ -78,10 +83,10 @@ services:
       - "9644:9644" # Admin API port
     healthcheck:
       test: ["CMD-SHELL", "curl -fs http://localhost:9644/v1/status/ready || exit 1"]
-      interval: 10s
-      retries: 5
-      start_period: 30s
-      timeout: 10s
+      interval: 2s
+      retries: 3
+      start_period: 5s
+      timeout: 5s
     command:
       - redpanda
       - start
@@ -99,9 +104,6 @@ services:
       - "PLAINTEXT://0.0.0.0:9092"
       - --advertise-kafka-addr
       - "PLAINTEXT://redpanda:9092"
-    depends_on:
-      db:
-        condition: service_healthy
 
   debezium:
     container_name: debezium
@@ -130,8 +132,10 @@ services:
         - curl
         - -f
         - http://localhost:8083/
-      interval: 10s
-      retries: 5
+      interval: 2s
+      retries: 3
+      start_period: 5s
+      timeout: 5s
     depends_on:
       redpanda:
         condition: service_healthy
@@ -146,16 +150,13 @@ services:
       - KAFKA_BROKERS=redpanda:9092
       - SCHEMA_REGISTRY_ENABLED=false
     depends_on:
-      redpanda:
-        condition: service_healthy
-      debezium:
-        condition: service_healthy
+      - debezium
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/"]
-      interval: 10s
-      retries: 5
-      start_period: 30s
-      timeout: 10s
+      interval: 2s
+      retries: 3
+      start_period: 5s
+      timeout: 5s
 
 
 
@@ -168,10 +169,10 @@ services:
       KAFKA_CONNECT_URIS: http://debezium:8083
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/"]
-      interval: 10s
-      retries: 5
-      start_period: 30s
-      timeout: 10s
+      interval: 2s
+      retries: 3
+      start_period: 5s
+      timeout: 5s
     depends_on:
       - debezium
   clickhouse:
@@ -216,6 +217,10 @@ services:
       debezium:
         condition: service_healthy
       clickhouse:
+        condition: service_healthy
+      redpanda-console:
+        condition: service_healthy
+      debezium-ui:
         condition: service_healthy
 
 volumes:

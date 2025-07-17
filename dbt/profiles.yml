@@ -1,0 +1,12 @@
+wildlife:
+  target: dev
+  outputs:
+    dev:
+      type: clickhouse
+      schema: staging
+      host: localhost
+      port: 8123
+      user: transformer
+      password: transformer
+      secure: false
+      threads: 4

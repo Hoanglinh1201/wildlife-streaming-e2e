@@ -3,10 +3,10 @@ import logging
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session, joinedload
 
-from backend.db.tables import AnimalDB, EventDB, TrackerDB, TrackingLogDB
+from backend.db.tables import AnimalDB, EventDB, TrackerDB
 from backend.models.animal import Animal, AnimalStatus
 from backend.models.event import Event
-from backend.models.tracker import Tracker, TrackingLog
+from backend.models.tracker import Tracker
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -69,13 +69,6 @@ def upsert_tracker(db: Session, trackers: list[Tracker]) -> None:
     )
     db.execute(stmt)
     logger.info(f"Upserted {len(rows)} trackers into the database.")
-
-
-def insert_tracking_log(db: Session, tracking_logs: list[TrackingLog]) -> None:
-    rows = [log.model_dump() for log in tracking_logs]
-    stmt = insert(TrackingLogDB).values(rows)
-    db.execute(stmt)
-    logger.info(f"Inserted {len(rows)} tracking logs into the database.")
 
 
 def insert_event(db: Session, events: list[Event]) -> None:
