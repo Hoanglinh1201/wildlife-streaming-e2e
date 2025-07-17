@@ -32,11 +32,16 @@ clean-targets:         # directories to be removed by `dbt clean`
 models:
   wildlife:
     staging:
-      schema: staging
-      materialized: table
+      +schema: staging
+      +materialized: table
+      cdc:
+        +tags: ['cdc']
+
     foundation:
-      schema: foundation
-      materialized: table
-    marts:
-      schema: marts
-      materialized: table
+      +schema: foundation
+      +materialized: table
+      +tags: ['foundation']
+    mart:
+      +schema: mart
+      +materialized: table
+      +tags: ['marts']
