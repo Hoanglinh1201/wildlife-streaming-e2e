@@ -1,7 +1,6 @@
 [project]
-name = "orchestrator"
+name = "wildlife-orchestrator"
 version = "0.1.0"
-description = "Dagster orchestrator"
 requires-python = ">=3.11,<3.13"
 dependencies = [
     "dagster>=1.11.2",
