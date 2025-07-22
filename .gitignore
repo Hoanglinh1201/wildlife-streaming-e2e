@@ -7,3 +7,8 @@ __pycache__/
 .tmp/
 
 logs/
+build/
+*.egg-info/
+dist/
+*.egg
+*.whl

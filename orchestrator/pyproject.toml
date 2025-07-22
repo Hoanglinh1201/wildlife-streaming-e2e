@@ -11,3 +11,6 @@ dependencies = [
 
 [tool.dagster]
 module_name = "orchestrator.definitions"
+
+[tool.setuptools.packages.find]
+where = ["."]

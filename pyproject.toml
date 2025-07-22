@@ -17,12 +17,6 @@ dependencies = [
 wildlife-backend = { path = "backend" }
 wildlife-orchestrator = { path = "orchestrator" }
 
-[tool.uv.workspace]
-members = [
-    "wildlife-backend",
-    "wildlife-orchestrator",
-]
-
 [tool.black]
 target-version = ["py313"]
 include = '\.pyi?$'
