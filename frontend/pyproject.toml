@@ -1,0 +1,15 @@
+[project]
+name = "frontend"
+version = "0.1.0"
+requires-python = ">=3.11,<3.13"
+dependencies = [
+    "clickhouse-driver>=0.2.9",
+    "pandas>=2.3.1",
+    "plotly>=6.2.0",
+    "pydeck>=0.9.1",
+    "streamlit>=1.47.0",
+    "streamlit-navigation-bar>=3.3.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]

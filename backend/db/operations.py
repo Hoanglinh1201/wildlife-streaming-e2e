@@ -23,6 +23,23 @@ def select_all_live_animals(db: Session) -> list[Animal]:
         .filter(AnimalDB.status == AnimalStatus.ALIVE)
         .all()
     )
+
+    # DEBUG: print out each ORM object and its tracker relationship
+    for idx, a in enumerate(orm_animals, start=1):
+        logger.info(
+            "[%d] AnimalDB(id=%r, name=%r) → tracker = %r",
+            idx,
+            a.id,
+            getattr(a, "name", None),
+            a.tracker,
+        )
+        if a.tracker is not None:
+            # Log all loaded tracker fields
+            tracker_data = {
+                k: v for k, v in vars(a.tracker).items() if not k.startswith("_")
+            }
+            logger.info("    tracker fields: %s", tracker_data)
+
     # Convert each ORM instance into a Pydantic model
     return [Animal.model_validate(a) for a in orm_animals]
 
@@ -58,13 +75,16 @@ def upsert_animals(db: Session, animals: list[Animal]) -> None:
 
 
 def upsert_tracker(db: Session, trackers: list[Tracker]) -> None:
-    rows = [t.model_dump(exclude={"lat", "lon", "battery_level"}) for t in trackers]
+    rows = [t.model_dump() for t in trackers]
     ins = insert(TrackerDB).values(rows)
     stmt = ins.on_conflict_do_update(
         index_elements=[TrackerDB.id],
         set_={
             "type": ins.excluded.type,
             "status": ins.excluded.status,
+            "lat": ins.excluded.lat,
+            "lon": ins.excluded.lon,
+            "battery_level": ins.excluded.battery_level,
         },
     )
     db.execute(stmt)

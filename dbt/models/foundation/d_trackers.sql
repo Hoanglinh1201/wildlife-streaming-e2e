@@ -11,6 +11,9 @@ select
     tracker_id,
     tracker_type,
     tracker_status,
+    lat,
+    lon,
+    battery_level,
     current_timestamp() as dwh_created_at
 from {{ ref('cdc_trackers') }}
 {% if is_incremental()%}

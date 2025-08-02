@@ -18,15 +18,13 @@ descriptive as (
         trackers.tracker_id as tracker_id,
         trackers.tracker_type,
         trackers.tracker_status,
-        locations.lat,
-        locations.lon,
-        locations.battery_level,
-        locations.dwh_created_at as tracker_location_at
+        trackers.lat,
+        trackers.lon,
+        trackers.battery_level,
+        trackers.dwh_created_at as tracker_location_at
     from {{ ref('d_animals') }} as animals
     left join {{ ref('d_trackers') }} as trackers
         on animals.tracker_id = trackers.tracker_id
-    left join {{ ref('d_tracker_locations') }} as locations
-        on animals.tracker_id = locations.tracker_id
 ),
 
 movement_metrics as (

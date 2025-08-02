@@ -2,6 +2,7 @@
 
 from dagster import (
     DagsterRunStatus,
+    DefaultSensorStatus,
     RunRequest,
     RunStatusSensorContext,
     run_status_sensor,
@@ -16,6 +17,7 @@ from .schedules import cdc_schedule
     monitored_jobs=[cdc_schedule.job],
     run_status=DagsterRunStatus.SUCCESS,
     request_job=foundation_job,
+    default_status=DefaultSensorStatus.RUNNING,
 )
 def trigger_foundation_after_cdc(context: RunStatusSensorContext) -> RunRequest:
     context.log.info("CDC job succeeded, triggering foundation job.")
@@ -27,6 +29,7 @@ def trigger_foundation_after_cdc(context: RunStatusSensorContext) -> RunRequest:
     monitored_jobs=[foundation_job],
     run_status=DagsterRunStatus.SUCCESS,
     request_job=mart_job,
+    default_status=DefaultSensorStatus.RUNNING,
 )
 def trigger_mart_after_foundation(context: RunStatusSensorContext) -> RunRequest:
     context.log.info("Foundation job succeeded, triggering mart job.")

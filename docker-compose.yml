@@ -246,6 +246,25 @@ services:
       start_period: 5s
       timeout: 5s
 
+  frontend:
+    container_name: frontend
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile.frontend
+    ports:
+      - "8503:8503" # Streamlit UI port
+    env_file:
+      - .env
+    depends_on:
+      clickhouse:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8503/"]
+      interval: 2s
+      retries: 3
+      start_period: 5s
+      timeout: 5s
+
 
 volumes:
   backend-db-data:

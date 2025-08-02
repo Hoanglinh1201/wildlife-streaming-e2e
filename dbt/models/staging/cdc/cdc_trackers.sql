@@ -13,6 +13,9 @@ select
     JSONExtractString(after, 'id') as tracker_id,
     JSONExtractString(after, 'type') as tracker_type,
     JSONExtractString(after, 'status') as tracker_status,
+    JSONExtractFloat(after, 'lat') as lat,
+    JSONExtractFloat(after, 'lon') as lon,
+    JSONExtractString(after, 'battery_level') as battery_level,
     CURRENT_TIMESTAMP() as dwh_created_at
 
 from {{ source('landing', 'cdc_trackers') }}

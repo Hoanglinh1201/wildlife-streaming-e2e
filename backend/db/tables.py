@@ -18,6 +18,9 @@ class TrackerDB(Base):
     id = Column(String, primary_key=True)
     type = Column(String, nullable=False)
     status = Column(String, nullable=False)
+    lat = Column(Float, nullable=False)
+    lon = Column(Float, nullable=False)
+    battery_level = Column(Float, nullable=False)
 
     animal = relationship("AnimalDB", back_populates="tracker", uselist=False)
 

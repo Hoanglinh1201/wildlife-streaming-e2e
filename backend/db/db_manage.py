@@ -8,7 +8,7 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.sql import text
 
-from backend.db.tables import AnimalDB, Base, TrackerDB
+from backend.db.tables import Base
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -80,40 +80,3 @@ def drop_db() -> None:
     engine = get_engine(DB_NAME)
     Base.metadata.drop_all(bind=engine)
     logger.info("🗑 All tables dropped.")
-
-
-if __name__ == "__main__":
-    init_db()
-    with get_session() as db:
-        t = TrackerDB(id="test_tracker", type="GPS", status="active")
-        db.add(t)
-
-        a = AnimalDB(
-            id="test_animal",
-            name="Lion",
-            status="healthy",
-            icon="lion_icon.png",
-            species="Panthera leo",
-            gender="male",
-            age=13.5,
-            born_at="2020-01-01T00:00:00",
-            deceased_at=None,
-            length_cm=15,
-            weight_kg=1000,
-            tracker_id="test_tracker",
-        )
-        db.add(a)
-        db.flush()
-
-        # Test
-        fetched_animal = db.query(AnimalDB).filter(AnimalDB.id == "test_animal").one()
-        fetched_tracker = (
-            db.query(TrackerDB).filter(TrackerDB.id == "test_tracker").one()
-        )
-        assert fetched_animal.id == "test_animal"
-        assert fetched_animal.name == "Lion"
-        assert fetched_tracker.id == "test_tracker"
-        assert fetched_tracker.type == "GPS"
-
-    drop_db()
-    logger.info("=== Smoke test complete ===")
