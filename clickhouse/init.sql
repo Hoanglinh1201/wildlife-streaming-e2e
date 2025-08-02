@@ -22,6 +22,7 @@ GRANT SELECT ON landing.* TO transformer;
 
 CREATE USER consumer IDENTIFIED WITH plaintext_password BY 'consumer';
 GRANT SELECT ON mart.* TO consumer;
+GRANT SELECT ON foundation.* TO consumer;
 
 
 -- Create Tables

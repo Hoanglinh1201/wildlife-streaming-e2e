@@ -44,4 +44,4 @@ models:
     mart:
       +schema: mart
       +materialized: table
-      +tags: ['marts']
+      +tags: ['mart']

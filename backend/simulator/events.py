@@ -1,3 +1,4 @@
+import logging
 import random
 from datetime import datetime
 
@@ -9,6 +10,8 @@ from backend.simulator.geo import (
     random_location_within_bounds,
     within_bounds,
 )
+
+logging.basicConfig(level=logging.INFO)
 
 settings = Settings()
 
@@ -42,6 +45,7 @@ def spawn() -> Animal:
     ## Update the tracker
     animal.tracker.lat = lat
     animal.tracker.lon = lon
+    logging.info(f"Spawning {animal.id} at location: ({lat}, {lon})")
 
     return animal
 
@@ -68,7 +72,8 @@ def move(animal: Animal) -> Animal:
     animal.tracker.lon = new_lon
 
     # After moving, battery is drained by 1% and age + 1 month
-    animal.tracker.battery_level = max(0, animal.tracker.battery_level - 1)
-    animal.age += 1 / 12  # Increment age by 1 month
+    animal.tracker.battery_level = max(0, animal.tracker.battery_level - 3)
+    animal.age += 1 / 6
+    logging.info(f"Animal {animal.id} moved to ({new_lat}, {new_lon})")
 
     return animal

@@ -89,6 +89,8 @@ async def spawn_cycle() -> None:
                             "tracker_id": a.tracker.id,
                             "lat": a.tracker.lat,
                             "lon": a.tracker.lon,
+                            "prev_lat": a.tracker.lat,
+                            "prev_lon": a.tracker.lon,
                             "battery_level": a.tracker.battery_level,
                             "remove_reason": "Max Age Reached",
                         },
@@ -107,6 +109,8 @@ async def spawn_cycle() -> None:
                             "tracker_id": a.tracker.id,
                             "lat": a.tracker.lat,
                             "lon": a.tracker.lon,
+                            "prev_lat": a.tracker.lat,
+                            "prev_lon": a.tracker.lon,
                             "battery_level": a.tracker.battery_level,
                         },
                     )

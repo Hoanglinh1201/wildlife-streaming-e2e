@@ -25,6 +25,8 @@ parsed as (
         JSONExtractString(detail_json,'tracker_id') AS tracker_id,
         JSONExtractFloat(detail_json,'lat') AS lat,
         JSONExtractFloat(detail_json,'lon') AS lon,
+        JSONExtractFloat(detail_json,'prev_lat') AS prev_lat,
+        JSONExtractFloat(detail_json,'prev_lon') AS prev_lon,
         JSONExtractFloat(detail_json,'battery_level') AS battery_level,
         JSONExtractString(detail_json,'remove_reason') AS remove_reason,
 
@@ -48,6 +50,8 @@ select
     tracker_id,
     lat,
     lon,
+    prev_lat,
+    prev_lon,
     battery_level,
     remove_reason,
     dwh_created_at
