@@ -19,7 +19,6 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --locked --no-install-project --no-dev
 
 COPY frontend/ ./frontend
-COPY frontend/.streamlit/ ./.streamlit
 
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --locked --no-dev
@@ -30,4 +29,7 @@ ENV PATH="/app/.venv/bin:$PATH"
 # Reset the entrypoint, don't invoke `uv`
 ENTRYPOINT []
 
-CMD ["streamlit", "run", "/app/frontend/main.py"]
+# Expose the Streamlit port
+EXPOSE 8503
+
+CMD [ "streamlit", "run", "/app/frontend/main.py", "--server.port", "8503"]

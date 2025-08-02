@@ -705,6 +705,7 @@ source = { directory = "frontend" }
 dependencies = [
     { name = "clickhouse-driver" },
     { name = "pandas" },
+    { name = "plotly" },
     { name = "pydeck" },
     { name = "streamlit" },
     { name = "streamlit-navigation-bar" },
@@ -714,6 +715,7 @@ dependencies = [
 requires-dist = [
     { name = "clickhouse-driver", specifier = ">=0.2.9" },
     { name = "pandas", specifier = ">=2.3.1" },
+    { name = "plotly", specifier = ">=6.2.0" },
     { name = "pydeck", specifier = ">=0.9.1" },
     { name = "streamlit", specifier = ">=1.47.0" },
     { name = "streamlit-navigation-bar", specifier = ">=3.3.0" },
