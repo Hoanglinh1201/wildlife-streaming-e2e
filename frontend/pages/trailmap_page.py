@@ -165,6 +165,17 @@ def create_trail_map(
 
 
 # --- Main Page Content ---
+st.markdown(
+    """
+    <div style="padding: 1rem; background-color: #f0f2f6; border-radius: 0.5rem;">
+        <h1 style="margin: 0;">🐾 Trail Deepdive 🐾</h1>
+        <p style="color: #555;">Visualizes previous tracked location as trail on map</p>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+st.divider()
+
 map_df = fetch_animal_list()
 label_df = get_label_mapping(map_df)
 

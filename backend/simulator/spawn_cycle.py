@@ -124,4 +124,4 @@ async def spawn_cycle() -> None:
             insert_event(db, event_to_insert)
 
         logger.info("Animal lifecycle update completed.")
-        await asyncio.sleep(settings.LIFECYCLE_UPDATE_INTERVAL)
+        await asyncio.sleep(settings.LIFECYCLE_UPDATE_INTERVAL_SECONDS)

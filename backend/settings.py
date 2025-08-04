@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     ANIMAL_LIMIT: int = 50  # Maximum number of animals in the park
 
     # Lifecycle
-    LIFECYCLE_UPDATE_INTERVAL: int = 60  # Spawn animals every seconds
+    LIFECYCLE_UPDATE_INTERVAL_SECONDS: int = 60  # Spawn animals every seconds
     SPAWN_NR: int = 5  # Number of animals to spawn each time
 
     # Move

@@ -8,34 +8,32 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# Hero section
+
 st.markdown(
     """
-<div style='background-image: url(https://example.com/banner.jpg);
-            background-size: cover;
-            padding: 3rem;
-            border-radius: .75rem;'>
-    <h1 style='color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.6);'>
+<h1 style='text-align: center; color: black; margin-top: -2rem;'>
     Welcome to the Wildlife Tracking E2E Trail Map
-    </h1>
-    <p style='color: white; font-size:18px;'>
+</h1>
+<p style='text-align: center; color: black; font-size:18px;'>
     An interactive app to visualize and explore animal movements, summaries, and events.
-    </p>
-</div>
+</p>
 """,
     unsafe_allow_html=True,
 )
 
-st.markdown("---")
+
+st.divider()
 
 # Feature cards in columns
-col1, col2, col3 = st.columns(3)
+_, col1, col2, _ = st.columns([2, 2, 6, 2], gap=None, vertical_alignment="center")
+
 with col1:
-    st.markdown("### 📌 Trail Map")
-    st.write("Follow historical movement paths of tracked wildlife.")
+    st.markdown("### [📌 Summary Page](/summary_page)")
+    st.caption("Overview of all tracked animals and their key statistics.")
+    st.markdown("### [📌 Trail Map Page](/trailmap_page)")
+    st.caption("Follow historical movement paths of tracked wildlife.")
+    st.markdown("### [📌 Event Page](/event_page)")
+    st.caption("Stay updated on the latest wildlife tracking events.")
+
 with col2:
-    st.markdown("### 📌 Summary Page")
-    st.write("Overview of all tracked animals and their key statistics.")
-with col3:
-    st.markdown("### 📌 Events Page")
-    st.write("Stay updated on the latest wildlife tracking events.")
+    st.image("frontend/images/banner.png", use_container_width=True)
