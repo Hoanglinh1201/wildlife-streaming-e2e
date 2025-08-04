@@ -12,9 +12,6 @@ build:
 start:
 	docker compose up -d
 
-start-dev:
-	docker compose up
-
 ## stop: stop the Docker containers
 stop:
 	docker compose down -v

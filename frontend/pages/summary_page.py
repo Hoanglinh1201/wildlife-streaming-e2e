@@ -136,6 +136,17 @@ def create_summary_pydeck_map(df: pd.DataFrame, zoom: int = 10, pitch: int = 0) 
 
 
 # --- Main Page Content ---
+st.markdown(
+    """
+    <div style="padding: 1rem; background-color: #f0f2f6; border-radius: 0.5rem;">
+        <h1 style="margin: 0;">🐾 Tracking Summary 🐾</h1>
+        <p style="color: #555;">provides tracking stats, animal location and distribution</p>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+st.divider()
+
 map_df = fetch_summary()
 animal_types = map_df["animal_type"].unique().tolist()
 animal_genders = map_df["gender"].unique().tolist()
